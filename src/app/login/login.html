@@ -1,0 +1,11 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <form (ngSubmit)="entrar()" class="card card-body" style="width: 360px">
+    <h4 class="mb-3 text-center">Iniciar sesión</h4>
+    @if (error()) {
+      <div class="alert alert-danger">{{ error() }}</div>
+    }
+    <input class="form-control mb-2" name="usuario" [(ngModel)]="usuario" placeholder="Usuario">
+    <input class="form-control mb-3" name="clave" type="password" [(ngModel)]="clave" placeholder="Clave">
+    <button class="btn btn-primary w-100" type="submit">Entrar</button>
+  </form>
+</div>

@@ -1,0 +1,20 @@
+@if (auth.logueado()) {
+  <div class="d-flex">
+    <nav class="bg-dark text-white p-3 vh-100 overflow-auto" style="min-width: 240px">
+      <h5>Tiendas Tech</h5>
+      <small class="d-block mb-3">Usuario: {{ auth.usuario() }}</small>
+      @for (p of menu(); track p.id) {
+        <div class="mt-3 text-uppercase small text-secondary">{{ p.nombre }}</div>
+        @for (h of p.hijos; track h.id) {
+          <a class="d-block text-white text-decoration-none py-1" [routerLink]="h.url" routerLinkActive="fw-bold">{{ h.nombre }}</a>
+        }
+      }
+      <button class="btn btn-outline-light btn-sm mt-4" (click)="auth.logout()">Cerrar sesión</button>
+    </nav>
+    <main class="flex-grow-1">
+      <router-outlet />
+    </main>
+  </div>
+} @else {
+  <router-outlet />
+}
