@@ -1,0 +1,108 @@
+<div class="container-fluid mt-4 px-4">
+  <h3>Inventario</h3>
+
+  @if (mensaje()) {
+    <div class="alert" [class.alert-danger]="esError()" [class.alert-success]="!esError()">{{ mensaje() }}</div>
+  }
+
+  <div class="row g-2 mb-3">
+    <div class="col-md-4">
+      <select class="form-select" name="idSucursal" [ngModel]="idSucursal" (ngModelChange)="cambiarSucursal($event)">
+        <option [ngValue]="null">Todas las sucursales</option>
+        @for (s of sucursales(); track s.id) {
+          <option [ngValue]="s.id">{{ s.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+      <button class="btn" [class.btn-primary]="vista() === 'existencias'" [class.btn-outline-primary]="vista() !== 'existencias'"
+              (click)="vista.set('existencias')">Existencias</button>
+      <button class="btn" [class.btn-primary]="vista() === 'kardex'" [class.btn-outline-primary]="vista() !== 'kardex'"
+              (click)="vista.set('kardex')">Movimientos (kardex)</button>
+    </div>
+  </div>
+
+  @if (vista() === 'existencias') {
+
+    @if (ajustando(); as f) {
+      <div class="card card-body mb-3 border-warning">
+        <h5>Ajustar existencia: {{ f.producto }} ({{ f.sucursal }}) - actual: {{ f.existencia }}</h5>
+        <div class="row g-2">
+          <div class="col-md-2">
+            <input class="form-control" type="number" min="0" name="nuevaExistencia" [(ngModel)]="nuevaExistencia" title="Nueva existencia">
+          </div>
+          <div class="col-md-6">
+            <input class="form-control" name="justificacion" [(ngModel)]="justificacion" placeholder="Justificación (conteo físico, pérdida, corrección...)">
+          </div>
+          <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-warning" type="button" (click)="confirmarAjuste()">Confirmar ajuste</button>
+            <button class="btn btn-secondary" type="button" (click)="ajustando.set(null)">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (editandoMinimo(); as f) {
+      <div class="card card-body mb-3 border-info">
+        <h5>Stock mínimo: {{ f.producto }} ({{ f.sucursal }}) - actual: {{ f.stockMinimo }}</h5>
+        <div class="row g-2">
+          <div class="col-md-2">
+            <input class="form-control" type="number" min="0" name="nuevoMinimo" [(ngModel)]="nuevoMinimo" title="Nuevo stock mínimo">
+          </div>
+          <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-info" type="button" (click)="confirmarMinimo()">Guardar mínimo</button>
+            <button class="btn btn-secondary" type="button" (click)="editandoMinimo.set(null)">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr><th>Sucursal</th><th>Código</th><th>Producto</th><th>Existencia</th><th>Mínimo</th><th>Estado</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (f of lista(); track f.id) {
+          <tr>
+            <td>{{ f.sucursal }}</td>
+            <td>{{ f.codigo }}</td>
+            <td>{{ f.producto }}</td>
+            <td>{{ f.existencia }}</td>
+            <td>{{ f.stockMinimo }}</td>
+            <td>
+              <span class="badge" [class.text-bg-danger]="f.estadoStock === 'BAJO'" [class.text-bg-success]="f.estadoStock !== 'BAJO'">{{ f.estadoStock }}</span>
+            </td>
+            <td class="text-end text-nowrap">
+              <button class="btn btn-sm btn-warning me-1" (click)="abrirAjuste(f)">Ajustar</button>
+              <button class="btn btn-sm btn-info" (click)="abrirMinimo(f)">Mínimo</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (vista() === 'kardex') {
+    <p class="text-muted">Últimos 200 movimientos {{ idSucursal ? 'de la sucursal elegida' : 'de todas las sucursales' }}.</p>
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr><th>ID</th><th>Fecha</th><th>Sucursal</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Origen</th><th>Justificación</th><th>Usuario</th></tr>
+      </thead>
+      <tbody>
+        @for (m of movimientos(); track m.id) {
+          <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.fecha }}</td>
+            <td>{{ m.sucursal }}</td>
+            <td>{{ m.producto }}</td>
+            <td>{{ m.tipo }}</td>
+            <td>{{ m.cantidad }}</td>
+            <td>{{ m.origen }} {{ m.idOrigen }}</td>
+            <td>{{ m.justificacion }}</td>
+            <td>{{ m.usuario }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

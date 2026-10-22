@@ -1,0 +1,52 @@
+<div class="container-fluid mt-4 px-4">
+  <h3>Bitácora</h3>
+
+  @if (mensaje()) {
+    <div class="alert alert-danger">{{ mensaje() }}</div>
+  }
+
+  <div class="row g-2 mb-3">
+    <div class="col-md-3">
+      <select class="form-select" name="tabla" [(ngModel)]="tabla">
+        <option value="">Todas las tablas</option>
+        @for (t of tablas(); track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" name="tipo" [(ngModel)]="tipo">
+        <option value="">Todos los movimientos</option>
+        <option value="UPDATE">UPDATE</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary" (click)="filtrar()">Filtrar</button>
+    </div>
+  </div>
+
+  <p class="text-muted">Últimos 300 movimientos registrados por los triggers.</p>
+
+  <table class="table table-striped table-hover table-sm">
+    <thead>
+      <tr><th>ID</th><th>Fecha</th><th>Tabla</th><th>Campo</th><th>Llave</th><th>Tipo</th><th>Valor anterior</th><th>Valor nuevo</th><th>Usuario BD</th><th>Equipo</th></tr>
+    </thead>
+    <tbody>
+      @for (b of filas(); track b.id) {
+        <tr>
+          <td>{{ b.id }}</td>
+          <td>{{ b.fecha }}</td>
+          <td>{{ b.tabla }}</td>
+          <td>{{ b.campo }}</td>
+          <td>{{ b.llave }}</td>
+          <td>{{ b.tipo }}</td>
+          <td>{{ b.anterior }}</td>
+          <td>{{ b.nuevo }}</td>
+          <td>{{ b.usuario }}</td>
+          <td>{{ b.equipo }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

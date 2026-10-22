@@ -1,0 +1,108 @@
+<div class="container-fluid mt-4 px-4">
+  <h3>Reclamos de garantía</h3>
+
+  @if (mensaje()) {
+    <div class="alert" [class.alert-danger]="esError()" [class.alert-success]="!esError()">{{ mensaje() }}</div>
+  }
+
+  <div class="card card-body mb-4">
+    <h5>Nuevo reclamo</h5>
+    <div class="row g-2 mb-2">
+      <div class="col-md-6">
+        <select class="form-select" name="idGarantia" [(ngModel)]="idGarantia">
+          <option [ngValue]="null">-- Garantía vigente --</option>
+          @for (g of vigentes(); track g.id) {
+            <option [ngValue]="g.id">{{ g.factura }} | {{ g.cliente }} | {{ g.producto }} | hasta {{ g.fin }} | quedan {{ g.cubierta - g.reclamada }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <select class="form-select" name="idSucursal" [(ngModel)]="idSucursal">
+          <option [ngValue]="null">-- Sucursal que recibe --</option>
+          @for (s of sucursales(); track s.id) {
+            <option [ngValue]="s.id">{{ s.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input class="form-control" type="number" min="1" name="cantidad" [(ngModel)]="cantidad" title="Cantidad reclamada">
+      </div>
+    </div>
+    <div class="row g-2">
+      <div class="col-md-9">
+        <input class="form-control" name="descripcion" [(ngModel)]="descripcion" placeholder="Descripción de la falla">
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary" type="button" (click)="guardar()">Registrar reclamo</button>
+      </div>
+    </div>
+  </div>
+
+  @if (cerrando(); as r) {
+    <div class="card card-body mb-4 border-warning">
+      <h5>Cerrar reclamo #{{ r.id }} - {{ r.producto }} (reclamadas: {{ r.reclamada }})</h5>
+      <div class="row g-2">
+        <div class="col-md-3">
+          <select class="form-select" name="resolucion" [ngModel]="resolucion" (ngModelChange)="cambiarResolucion($event)">
+            <option value="REPARACION">Reparación</option>
+            <option value="CAMBIO">Cambio del artículo</option>
+            <option value="RECHAZADO">Rechazado</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <input class="form-control" type="number" min="0" [max]="r.reclamada" name="aprobada"
+                 [(ngModel)]="aprobada" [disabled]="resolucion === 'RECHAZADO'" title="Cantidad aprobada">
+        </div>
+        @if (resolucion === 'CAMBIO') {
+          <div class="col-md-4">
+            <select class="form-select" name="idReemplazo" [(ngModel)]="idReemplazo">
+              <option [ngValue]="null">-- Producto de reemplazo (con existencia) --</option>
+              @for (p of disponibles(); track p.id) {
+                <option [ngValue]="p.id">{{ p.codigo }} - {{ p.nombre }} | Existencia: {{ p.existencia }}</option>
+              }
+            </select>
+          </div>
+        }
+        <div class="col-md-3 d-flex gap-2">
+          <button class="btn btn-warning" type="button" (click)="confirmarCierre()">Confirmar cierre</button>
+          <button class="btn btn-secondary" type="button" (click)="cancelarCierre()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <h5>Reclamos registrados</h5>
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>ID</th><th>Fecha</th><th>Factura</th><th>Producto</th><th>Sucursal</th><th>Falla</th>
+        <th>Reclamada</th><th>Aprobada</th><th>Resolución</th><th>Reemplazo</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of lista(); track r.id) {
+        <tr>
+          <td>{{ r.id }}</td>
+          <td>{{ r.fecha }}</td>
+          <td>{{ r.factura }}</td>
+          <td>{{ r.producto }}</td>
+          <td>{{ r.sucursal }}</td>
+          <td>{{ r.descripcion }}</td>
+          <td>{{ r.reclamada }}</td>
+          <td>{{ r.aprobada }}</td>
+          <td>{{ r.resolucion }}</td>
+          <td>{{ r.reemplazo }}</td>
+          <td>{{ r.estado }}</td>
+          <td class="text-end text-nowrap">
+            @if (r.estado === 'RECIBIDO') {
+              <button class="btn btn-sm btn-info me-1" (click)="enProceso(r)">En proceso</button>
+            }
+            @if (r.estado !== 'CERRADO') {
+              <button class="btn btn-sm btn-warning" (click)="abrirCierre(r)">Cerrar</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

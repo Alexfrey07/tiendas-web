@@ -43,6 +43,19 @@ export class AuthService {
     );
   }
 
+
+    primeraRuta(): string {
+    const items = this.menu();
+    const padres = items.filter(p => p.ID_MENU_PADRE == null).sort((a, b) => a.ORDEN - b.ORDEN);
+    for (const p of padres) {
+      const hijo = items
+        .filter(h => h.ID_MENU_PADRE === p.ID_MENU && h.URL_PANTALLA)
+        .sort((a, b) => a.ORDEN - b.ORDEN)[0];
+      if (hijo) return hijo.URL_PANTALLA!;
+    }
+    return '';
+  }
+  
   logout() {
     sessionStorage.clear();
     this.token.set(null);

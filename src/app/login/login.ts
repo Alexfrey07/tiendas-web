@@ -15,9 +15,18 @@ export class Login {
   clave = '';
   error = signal('');
 
+  constructor() {
+    if (this.auth.logueado()) this.irAlInicio();
+  }
+
+  private irAlInicio() {
+    const ruta = this.auth.primeraRuta();
+    if (ruta) this.router.navigate([ruta]);
+  }
+
   entrar() {
     this.auth.login(this.usuario, this.clave).subscribe({
-      next: () => this.router.navigate(['/categorias']),
+      next: () => this.irAlInicio(),
       error: () => this.error.set('Usuario o clave incorrectos')
     });
   }

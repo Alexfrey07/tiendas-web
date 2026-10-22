@@ -1,0 +1,54 @@
+<div class="container-fluid mt-4 px-4">
+  <h3>Dashboard gerencial</h3>
+
+  @if (mensaje()) {
+    <div class="alert alert-danger">{{ mensaje() }}</div>
+  }
+
+  @if (kpis(); as k) {
+    <div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+      <div class="col"><div class="card text-bg-primary"><div class="card-body">
+        <div class="small">Total vendido</div><div class="fs-5">Q {{ k.totalVentas | number:'1.2-2' }}</div>
+      </div></div></div>
+      <div class="col"><div class="card text-bg-success"><div class="card-body">
+        <div class="small">Facturas emitidas</div><div class="fs-5">{{ k.facturas }}</div>
+      </div></div></div>
+      <div class="col"><div class="card text-bg-warning"><div class="card-body">
+        <div class="small">Notas de crédito</div><div class="fs-5">Q {{ k.notasCredito | number:'1.2-2' }}</div>
+      </div></div></div>
+      <div class="col"><div class="card text-bg-danger"><div class="card-body">
+        <div class="small">Productos con stock bajo</div><div class="fs-5">{{ k.stockBajo }}</div>
+      </div></div></div>
+      <div class="col"><div class="card text-bg-info"><div class="card-body">
+        <div class="small">Reclamos abiertos</div><div class="fs-5">{{ k.reclamosAbiertos }}</div>
+      </div></div></div>
+    </div>
+  }
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card card-body">
+        <h6>Ventas por sucursal (Q)</h6>
+        <div style="position: relative; height: 300px"><canvas #cSucursal></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card card-body">
+        <h6>Ventas por categoría (Q)</h6>
+        <div style="position: relative; height: 300px"><canvas #cCategoria></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card card-body">
+        <h6>Top 5 productos más vendidos (unidades)</h6>
+        <div style="position: relative; height: 300px"><canvas #cProductos></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card card-body">
+        <h6>Reclamos de garantía por resolución</h6>
+        <div style="position: relative; height: 300px"><canvas #cReclamos></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>

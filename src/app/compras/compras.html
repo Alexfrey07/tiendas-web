@@ -1,0 +1,122 @@
+<div class="container-fluid mt-4 px-4">
+  <h3>Compras</h3>
+
+  @if (mensaje()) {
+    <div class="alert" [class.alert-danger]="esError()" [class.alert-success]="!esError()">{{ mensaje() }}</div>
+  }
+
+  <div class="card card-body mb-4">
+    <h5>Nueva compra</h5>
+    <div class="row g-2 mb-3">
+      <div class="col-md-3">
+        <select class="form-select" name="idProveedor" [(ngModel)]="idProveedor">
+          <option [ngValue]="null">-- Proveedor --</option>
+          @for (p of proveedores(); track p.id) {
+            <option [ngValue]="p.id">{{ p.razonSocial }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="idSucursal" [(ngModel)]="idSucursal">
+          <option [ngValue]="null">-- Sucursal que recibe --</option>
+          @for (s of sucursales(); track s.id) {
+            <option [ngValue]="s.id">{{ s.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input class="form-control" name="numeroDocumento" [(ngModel)]="numeroDocumento" placeholder="No. de documento">
+      </div>
+      <div class="col-md-3">
+        <input class="form-control" name="observaciones" [(ngModel)]="observaciones" placeholder="Observaciones">
+      </div>
+    </div>
+
+    <div class="row g-2 mb-2">
+      <div class="col-md-5">
+        <select class="form-select" name="lineaProducto" [ngModel]="lineaProducto" (ngModelChange)="elegirProducto($event)">
+          <option [ngValue]="null">-- Producto --</option>
+          @for (p of productos(); track p.id) {
+            <option [ngValue]="p.id">{{ p.codigo }} - {{ p.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input class="form-control" type="number" min="1" name="lineaCantidad" [(ngModel)]="lineaCantidad" title="Cantidad">
+      </div>
+      <div class="col-md-2">
+        <input class="form-control" type="number" min="0" step="0.01" name="lineaCosto" [(ngModel)]="lineaCosto" title="Costo unitario">
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-outline-primary" type="button" (click)="agregarLinea()">Agregar producto</button>
+      </div>
+    </div>
+
+    @if (lineas().length > 0) {
+      <table class="table table-sm">
+        <thead><tr><th>Producto</th><th>Cantidad</th><th>Costo</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody>
+          @for (l of lineas(); track l.idProducto; let i = $index) {
+            <tr>
+              <td>{{ l.producto }}</td>
+              <td>{{ l.cantidad }}</td>
+              <td>Q {{ l.costoUnitario | number:'1.2-2' }}</td>
+              <td>Q {{ l.cantidad * l.costoUnitario | number:'1.2-2' }}</td>
+              <td class="text-end"><button class="btn btn-sm btn-outline-danger" type="button" (click)="quitarLinea(i)">Quitar</button></td>
+            </tr>
+          }
+        </tbody>
+        <tfoot><tr><th colspan="3" class="text-end">Total</th><th>Q {{ total() | number:'1.2-2' }}</th><th></th></tr></tfoot>
+      </table>
+    }
+
+    <div><button class="btn btn-primary" type="button" (click)="guardar()">Guardar compra</button></div>
+  </div>
+
+  <h5>Compras registradas</h5>
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr><th>ID</th><th>Documento</th><th>Proveedor</th><th>Sucursal</th><th>Empleado</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (c of lista(); track c.id) {
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.numeroDocumento }}</td>
+          <td>{{ c.proveedor }}</td>
+          <td>{{ c.sucursal }}</td>
+          <td>{{ c.empleado }}</td>
+          <td>{{ c.fecha }}</td>
+          <td>Q {{ c.total | number:'1.2-2' }}</td>
+          <td>{{ c.estado }}</td>
+          <td class="text-end text-nowrap">
+            <button class="btn btn-sm btn-info me-1" (click)="ver(c.id)">Ver</button>
+            @if (c.estado === 'PENDIENTE') {
+              <button class="btn btn-sm btn-success me-1" (click)="recibir(c)">Recibir</button>
+              <button class="btn btn-sm btn-danger" (click)="cancelar(c)">Cancelar</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (detalleDe()) {
+    <div class="card card-body">
+      <h5>Detalle de la compra #{{ detalleDe() }}</h5>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Producto</th><th>Cantidad</th><th>Costo</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          @for (d of detalle(); track d.idProducto) {
+            <tr>
+              <td>{{ d.producto }}</td>
+              <td>{{ d.cantidad }}</td>
+              <td>Q {{ d.costoUnitario | number:'1.2-2' }}</td>
+              <td>Q {{ d.subtotal | number:'1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

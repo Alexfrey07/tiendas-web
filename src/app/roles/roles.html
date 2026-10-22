@@ -1,0 +1,78 @@
+<div class="container-fluid mt-4 px-4">
+  <h3>Roles y permisos</h3>
+
+  @if (mensaje()) {
+    <div class="alert" [class.alert-danger]="esError()" [class.alert-success]="!esError()">{{ mensaje() }}</div>
+  }
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card card-body mb-3">
+        <h5>Nuevo rol</h5>
+        <div class="row g-2">
+          <div class="col-md-5">
+            <input class="form-control" name="nombre" [(ngModel)]="nombre" placeholder="Nombre del rol">
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" name="descripcion" [(ngModel)]="descripcion" placeholder="Descripción">
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary" type="button" (click)="crear()">Crear</button>
+          </div>
+        </div>
+      </div>
+
+      <table class="table table-striped table-hover">
+        <thead><tr><th>Rol</th><th>Descripción</th><th>Usuarios</th><th></th></tr></thead>
+        <tbody>
+          @for (r of lista(); track r.id) {
+            <tr [class.table-active]="seleccionado()?.id === r.id">
+              <td>{{ r.nombre }}</td>
+              <td>{{ r.descripcion }}</td>
+              <td>{{ r.usuarios }}</td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-info me-1" (click)="elegir(r)">Permisos</button>
+                <button class="btn btn-sm btn-danger" (click)="eliminar(r)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-lg-7">
+      @if (seleccionado(); as r) {
+        <div class="card card-body">
+          <h5>Permisos del rol {{ r.nombre }}</h5>
+          @if (esAdmin()) {
+            <div class="alert alert-secondary">Los permisos del administrador no se pueden modificar.</div>
+          }
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr><th>Pantalla</th><th class="text-center">Ver</th><th class="text-center">Agregar</th><th class="text-center">Editar</th><th class="text-center">Eliminar</th></tr>
+            </thead>
+            <tbody>
+              @for (p of permisos(); track p.idMenu; let i = $index) {
+                @if (i === 0 || permisos()[i - 1].grupo !== p.grupo) {
+                  <tr class="table-secondary"><td colspan="5"><b>{{ p.grupo }}</b></td></tr>
+                }
+                <tr>
+                  <td>{{ p.opcion }}</td>
+                  <td class="text-center"><input type="checkbox" [checked]="p.lectura === 'S'" [disabled]="esAdmin()" (change)="cambiar(p, 'lectura', $any($event.target).checked)"></td>
+                  <td class="text-center"><input type="checkbox" [checked]="p.escritura === 'S'" [disabled]="esAdmin()" (change)="cambiar(p, 'escritura', $any($event.target).checked)"></td>
+                  <td class="text-center"><input type="checkbox" [checked]="p.edicion === 'S'" [disabled]="esAdmin()" (change)="cambiar(p, 'edicion', $any($event.target).checked)"></td>
+                  <td class="text-center"><input type="checkbox" [checked]="p.eliminacion === 'S'" [disabled]="esAdmin()" (change)="cambiar(p, 'eliminacion', $any($event.target).checked)"></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (!esAdmin()) {
+            <div><button class="btn btn-primary" type="button" (click)="guardar()">Guardar permisos</button></div>
+          }
+        </div>
+      } @else {
+        <p class="text-muted">Seleccione un rol y pulse "Permisos" para ver y modificar a qué pantallas tiene acceso.</p>
+      }
+    </div>
+  </div>
+</div>

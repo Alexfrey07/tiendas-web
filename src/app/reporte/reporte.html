@@ -1,0 +1,38 @@
+<div class="container-fluid mt-4 px-4">
+  @if (mensaje()) {
+    <div class="alert alert-danger">{{ mensaje() }}</div>
+  }
+
+  @if (datos(); as d) {
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>{{ d.titulo }}</h3>
+      <div class="d-flex gap-2">
+        <button class="btn btn-success" (click)="descargar('excel')">Exportar a Excel</button>
+        <button class="btn btn-danger" (click)="descargar('pdf')">Exportar a PDF</button>
+      </div>
+    </div>
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          @for (c of d.columnas; track c.campo) {
+            <th>{{ c.titulo }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of d.filas; track $index) {
+          <tr>
+            @for (c of d.columnas; track c.campo) {
+              <td>{{ formato(c.campo, f[c.campo]) }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (d.filas.length === 0) {
+      <p class="text-muted">Todavía no hay datos para este reporte.</p>
+    }
+  }
+</div>
